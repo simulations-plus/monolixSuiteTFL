@@ -313,8 +313,8 @@ utils::globalVariables(c("."))
 #
 # lixoftConnectors is in Suggests: it is installed with MonolixSuite rather than
 # from CRAN, and styleTFL() works without it. Initializing the connectors loads
-# the MonolixSuite library (lib/lixoftConnectors.dll on Windows) from the
-# installation folder, which is either passed as `path` or read from the
+# the MonolixSuite library (lib/lixoftConnectors.dll on Windows,
+# lib/liblixoftConnectors.so on Linux and macOS) from the installation folder, which is either passed as `path` or read from the
 # `monolixSuite=` line of ~/lixoft/lixoft.ini (the most recently launched
 # MonolixSuite version). Constraints imposed by lixoftConnectors:
 #   * the library can only be loaded once per R session, so the installation
@@ -330,11 +330,15 @@ utils::globalVariables(c("."))
 
 #' Whether the lixoftConnectors MonolixSuite library is loaded in this session
 #'
-#' Same test that `lixoftConnectors::initializeLixoftConnectors()` uses: the
-#' library is a DLL named "lixoftConnectors" (the R package itself has no DLL).
+#' Same test that `lixoftConnectors::initializeLixoftConnectors()` uses: whether
+#' the MonolixSuite library is among the loaded DLLs (the R package itself has no
+#' DLL). The DLL name is the library file name without extension, which depends
+#' on the OS: "lixoftConnectors" (lixoftConnectors.dll) on Windows, and
+#' "liblixoftConnectors" (liblixoftConnectors.so) on Linux and macOS.
+#' @param dlls Names of the loaded DLLs.
 #' @noRd
-.connectorsInitialized <- function() {
-	!is.null(getLoadedDLLs()[["lixoftConnectors"]])
+.connectorsInitialized <- function(dlls = names(getLoadedDLLs())) {
+	any(c("lixoftConnectors", "liblixoftConnectors") %in% dlls)
 }
 
 #' Whether the zip package is loaded, after which the connectors cannot be initialized

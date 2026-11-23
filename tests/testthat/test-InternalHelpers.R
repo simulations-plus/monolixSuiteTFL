@@ -106,6 +106,14 @@ test_that(".connectorInitHelp explains how to set the MonolixSuite folder", {
 	expect_match(.connectorInitHelp(restart = FALSE), "currently \"D:/Lixoft/MonolixSuite2024R1\"", fixed = TRUE)
 })
 
+test_that(".connectorsInitialized recognizes the library name on every OS", {
+	# Windows: lixoftConnectors.dll; Linux and macOS: liblixoftConnectors.so
+	expect_true(.connectorsInitialized(c("base", "lixoftConnectors")))
+	expect_true(.connectorsInitialized(c("base", "liblixoftConnectors")))
+	expect_false(.connectorsInitialized(c("base", "zip")))
+	expect_false(.connectorsInitialized(character()))
+})
+
 test_that(".connectorInitHelp gives restart-only instructions by default when zip is loaded", {
 	local_mocked_bindings(.zipLoaded = function() TRUE)
 	expect_identical(.connectorInitHelp(), .connectorInitHelp(restart = TRUE))
